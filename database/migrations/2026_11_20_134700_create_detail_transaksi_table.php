@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+         if (!Schema::hasTable('detail_transaksi')) {
         Schema::create('detail_transaksi', function (Blueprint $table) {
     $table->id('id_detail_transaksi');
 
@@ -26,6 +27,7 @@ return new class extends Migration
     $table->decimal('subtotal', 14, 2); // jumlah * harga_satuan
     $table->timestamps();
 });
+    }
     }
 
     public function down(): void
