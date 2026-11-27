@@ -8,25 +8,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('transaksi', function (Blueprint $table) {
-            $table->id('id_transaksi');
-            $table->string('no_transaksi', 30)->unique();          // contoh: TRX-20261120-0001
-            $table->date('tanggal');
-            $table->enum('jenis', ['MASUK', 'KELUAR']);
-            $table->foreignId('id_user')                             // petugas pencatat
-                  ->constrained('users')
-                  ->restrictOnDelete();
-            $table->foreignId('id_pemasok')                          // diisi hanya saat MASUK
-                  ->nullable()
-                  ->constrained('pemasok', 'id_pemasok')
-                  ->nullOnDelete();
-            $table->string('nama_pembeli', 120)->nullable();        // diisi saat KELUAR
-            $table->decimal('total', 14, 2)->default(0);
-            $table->text('keterangan')->nullable();
-            $table->timestamps();
+        Schema::create('detail_transaksi', function (Blueprint $table) {
+    $table->id('id_detail_transaksi');
 
-            $table->index(['tanggal', 'jenis']);
-        });
+    // Relasi ke tabel transaksi utama
+    $table->foreignId('id_transaksi')
+          ->constrained('transaksi', 'id_transaksi')
+          ->cascadeOnDelete(); // Jika transaksi dihapus, detailnya ikut terhapus
+
+    // Relasi ke tabel barang
+    $table->foreignId('id_barang')
+          ->constrained('barang', 'id_barang')
+          ->restrictOnDelete();
+
+    $table->unsignedInteger('jumlah'); // Jumlah barang yang masuk/keluar
+    $table->decimal('harga_satuan', 12, 2); // Harga saat transaksi terjadi
+    $table->decimal('subtotal', 14, 2); // jumlah * harga_satuan
+    $table->timestamps();
+});
     }
 
     public function down(): void
